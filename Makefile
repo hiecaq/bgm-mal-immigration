@@ -5,7 +5,7 @@ install:
 	@pip install -e .
 
 unintall:
-	@pip uninstall s1acker
+	@pip uninstall bgm_mal_immigration
 
 create:
 	@python setup.py sdist bdist_wheel
