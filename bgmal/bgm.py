@@ -15,7 +15,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
-from .api import AnimeWebsite
+from .api import AnimeWebsite, LoginFailedException
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ class Bangumi(AnimeWebsite):
             self._auth = output['auth']
         except Exception as e:
             logger.error("logging failed: %s", e)
-            raise e
+            raise LoginFailedException()
 
     def watched_list(self):
         """Return the watched list of anime

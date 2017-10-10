@@ -12,6 +12,10 @@
 from abc import ABC, abstractmethod
 
 
+class LoginFailedException(Exception):
+    pass
+
+
 class AnimeWebsite(ABC):
     """AnimeWebsite is an ABC defined generally for potentially all
     shared features among Bangumi, MyAnimeList, etc
