@@ -15,23 +15,25 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
+from .api import AnimeWebsite
+
 logger = logging.getLogger(__name__)
 
 
-class Bangumi(object):
+class Bangumi(AnimeWebsite):
     """Manipulate the bgm api"""
 
-    def __init__(self, email, password):
-        """Construct a bangumi object with given email and password
+    def __init__(self, account, password):
+        """Construct a bangumi object with given account and password
 
-        :param str email: user's email
+        :param str account: user's email address
         :param str password: user's password
         :returns: a ``Bangumi`` object
 
         """
         data = {
             'password': password,
-            'username': email,
+            'username': account,
             'auth': 0,
             'sysuid': 0,
             'sysusername': 0
