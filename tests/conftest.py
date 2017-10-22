@@ -17,7 +17,7 @@ import pytest
 import responses
 from bs4 import BeautifulSoup
 
-DIR = op.join(op.dirname(op.abspath(__file__)), 'web')
+DIR = op.join(op.dirname(op.abspath(__file__)), 'fixtures')
 
 
 def get_content(web, name):
