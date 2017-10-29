@@ -51,14 +51,14 @@ class MyAnimeList(AnimeWebsite):
         """
         url = 'https://myanimelist.net/api/account/verify_credentials.xml'
         r = requests.get(url, auth=(self._account, self._password))
-        r.raise_for_status()
         soup = BeautifulSoup(r.content, 'lxml')
         try:
-            username = soup.find('username').string
+            r.raise_for_status()
         except Exception as e:
             logger.error("logging failed: %s", e)
             raise LoginFailedException()
         else:
+            username = soup.find('username').string
             return username
 
     def watched_list(self):

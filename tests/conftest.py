@@ -30,7 +30,6 @@ def get_content(web, name):
 def mock_bgm():
     def request_callback(request):
         payload = dict(parse_qsl(request.body))
-        print(payload)
         if (payload['password'] == "PASSWORD"
                 and payload['username'] == "ACCOUNT"
                 and payload['auth'] == '0'
@@ -58,6 +57,24 @@ def mock_bgm():
             responses.GET,
             'https://bgm.tv/anime/list/42/collect?page=2',
             body=get_content('bgm', 'collect2.html'),
+            status=200
+        )
+        yield rsps
+
+
+@pytest.fixture
+def mock_mal():
+    with responses.RequestsMock(assert_all_requests_are_fired=False) as rsps:
+        rsps.add(
+            responses.GET,
+            'https://myanimelist.net/api/account/verify_credentials.xml',
+            body=get_content('mal', 'verify.xml'),
+            status=200
+        )
+        rsps.add(
+            responses.GET,
+            'https://myanimelist.net/animelist/USERNAME?status=2',
+            body=get_content('mal', 'collect.html'),
             status=200
         )
         yield rsps
