@@ -1,3 +1,5 @@
+.PHONY: test install uninstall create clean upload
+
 test:
 	@pytest --pep8 -q
 
