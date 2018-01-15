@@ -35,6 +35,12 @@ class TestBangumi(object):
         assert entry.title == '機動戦士ガンダムSEED DESTINY'
         assert entry.userscore == 5
 
+    def test_search(self):
+        b = Bangumi("ACCOUNT", "PASSWORD")
+        anime = b.search("gunslinger girl")
+        assert anime.title == "GUNSLINGER GIRL"
+        assert anime.score == 7.9
+
 
 class TestBgmanime(object):
     @pytest.mark.parametrize('f', ['anime1.html'])

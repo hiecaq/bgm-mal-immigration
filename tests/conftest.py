@@ -59,6 +59,17 @@ def mock_bgm():
             body=get_content('bgm', 'collect2.html'),
             status=200
         )
+        rsps.add(
+            responses.GET,
+            url=(
+                'https://api.bgm.tv/search/subject/{0}?{1}&{2}&{3}'.format(
+                    'gunslinger%20girl', 'responseGroup=large',
+                    'max_results=11', 'start=0'
+                )
+            ),
+            body=get_content('bgm', 'search.json'),
+            status=200
+        )
         yield rsps
 
 
