@@ -15,7 +15,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 
-from .api import AnimeWebsite, LoginFailedException
+from .api import AnimeItem, AnimeWebsite, LoginFailedException
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +57,17 @@ class Bangumi(AnimeWebsite):
         :returns: a list of anime entries, described in dict of name and score
 
         """
+
+        def has_next_page(soup):
+            """Return if this page have a next page.
+
+            :param BeautifulSoup soup: the soup of the given page
+            :returns: True or False
+
+            """
+            pages = soup.find(class_='page_inner')
+            return pages.find_all(class_='p')[-1].string == '››'
+
         url = 'https://bgm.tv/anime/list/{0}/collect'.format(self._uid)
         page = 1
         watched = []
@@ -66,61 +77,82 @@ class Bangumi(AnimeWebsite):
             soup = BeautifulSoup(r.content, 'lxml')
             items = soup.find_all('li', class_='item')
             for item in items:
-                anime = Bgmanime(item)
-                watched.append({'title': anime.title, 'score': anime.score})
-            if not Bangumi._has_next_page(soup):
+                watched.append(Bgmanime(item))
+            if not has_next_page(soup):
                 break
             page += 1
             time.sleep(1)
 
         return watched
 
-    @classmethod
-    def _has_next_page(cls, soup):
-        """Return if this page have a next page.
+    def search(self, title):
+        """Return an ``AnimeItem`` object representing the anime entry
+        of this search result.
 
-        :param BeautifulSoup soup: the soup of the given page
-        :returns: True or False
-
-        """
-        pages = soup.find(class_='page_inner')
-        return pages.find_all(class_='p')[-1].string == '››'
-
-
-class Bgmanime(object):
-    """One entry for one anime from Bangumi"""
-
-    def __init__(self, item):
-        """
-
-        :type tag: bs4.element.Tag
-        :returns: a ``Bgmanime`` object
+        :param str title: the title user wish to search
+        :returns: an ``AnimeItem`` object representing the search result
+        :rtype: AnimeItem
 
         """
-        self._item = item
+        url = 'https://api.bgm.tv/search/subject/{0}'.format(title)
 
-    @property
-    def score(self):
+        def get_raw_result():
+            """Return the search result.
+
+            :returns: a list of pre-edited items
+
+            """
+            params = {
+                'responseGroup': 'large',
+                'max_results': '11',
+                'start': '0'
+            }
+            r = requests.get(url, params)
+            r.raise_for_status()
+
+            result = r.json()
+            return result['list']
+
+        def raw_to_AnimeItem(raw):
+            """Return the parsed ``AnimeItem`` object for the given raw item.
+
+            :param raw: the raw BeautifulSoup Tag
+            :returns: a parsed AnimeItem
+            :rtype: AnimeItem
+
+            """
+            return AnimeItem(raw['name'], raw['rating']['score'], None)
+
+        return raw_to_AnimeItem(
+            next((raw for raw in get_raw_result() if raw['type'] == 2), None)
+        )
+
+
+def Bgmanime(item):
+    """Build an AnimeItem with the given soup."""
+
+    def score():
         """Return the user's score of this anime
         :returns: score
         :rtype: int
 
         """
-        starsinfo = self._item.find(class_='starsinfo')['class']
+        starsinfo = item.find(class_='starsinfo')['class']
         stars = (
             starsinfo[0] if starsinfo[0] != 'starsinfo' else starsinfo[-1]
         )
         return int(stars[6:])
 
-    @property
-    def title(self):
+    def title():
         """Return the title of this anime
         :returns: title of this anime
         :rtype: str
 
         """
         return (
-            self._item.find(class_='grey').string
-            if self._item.find(class_='grey') is not None else
-            self._item.find(class_='l').string
+            item.find(class_='grey').string
+            if item.find(class_='grey') is not None else
+            item.find(class_='l').string
         )
+
+    return AnimeItem(title(), None, score())

@@ -27,16 +27,22 @@ class TestMyAnimeList(object):
         assert e
 
     def test_login_success(self):
-        b = MyAnimeList("ACCOUNT@EXAMPLE.COM", "PASSWORD")
-        assert b._account == "ACCOUNT@EXAMPLE.COM"
-        assert b._password == "PASSWORD"
-        assert b.username == "USERNAME"
+        a = MyAnimeList("ACCOUNT@EXAMPLE.COM", "PASSWORD")
+        assert a._account == "ACCOUNT@EXAMPLE.COM"
+        assert a._password == "PASSWORD"
+        assert a.username == "USERNAME"
 
     def test_watched_list(self):
-        b = MyAnimeList("ACCOUNT@EXAMPLE.COM", "PASSWORD")
-        watchlist = b.watched_list()
+        a = MyAnimeList("ACCOUNT@EXAMPLE.COM", "PASSWORD")
+        watchlist = a.watched_list()
         assert len(watchlist) == 73
 
         entry = watchlist[1]
         assert entry['title'] == 'Ao no Exorcist Movie'
         assert entry['score'] == 8
+
+    def test_search(self):
+        a = MyAnimeList("ACCOUNT@EXAMPLE.COM", "PASSWORD")
+        anime = a.search("あああ")
+        assert anime.title == "えええ"
+        assert anime.score == 7.76

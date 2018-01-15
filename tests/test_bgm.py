@@ -32,8 +32,8 @@ class TestBangumi(object):
         assert len(watchlist) == 47
 
         entry = watchlist[1]
-        assert entry['title'] == '機動戦士ガンダムSEED DESTINY'
-        assert entry['score'] == 5
+        assert entry.title == '機動戦士ガンダムSEED DESTINY'
+        assert entry.userscore == 5
 
 
 class TestBgmanime(object):
@@ -41,10 +41,10 @@ class TestBgmanime(object):
     def test_bgm_anime2(self, bgm_anime):
         anime = Bgmanime(bgm_anime)
         assert anime.title == "AIR"
-        assert anime.score == 8
+        assert anime.userscore == 8
 
     @pytest.mark.parametrize('f', ['anime2.html'])
     def test_bgm_anime1(self, bgm_anime):
         anime = Bgmanime(bgm_anime)
         assert anime.title == "ピンポン THE ANIMATION"
-        assert anime.score == 10
+        assert anime.userscore == 10

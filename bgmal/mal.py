@@ -15,7 +15,7 @@ import logging
 import requests
 from bs4 import BeautifulSoup
 
-from .api import AnimeWebsite, LoginFailedException
+from .api import AnimeItem, AnimeWebsite, LoginFailedException
 
 logger = logging.getLogger(__name__)
 
@@ -79,3 +79,50 @@ class MyAnimeList(AnimeWebsite):
             'title': entry['anime_title'],
             'score': entry['score']
         } for entry in data]
+
+    def search(self, title):
+        """Search and return an ``AnimeItem`` object representing the result.
+
+        :param str title: the title user wish to search.
+        :returns: an ``AnimeItem`` object representing the search result.
+        :rtype: AnimeItem
+
+        """
+        r = requests.get(
+            'https://myanimelist.net/search/prefix.json',
+            params={'type': 'anime',
+                    'keyword': title}
+        )
+        r.raise_for_status()
+        data = json.loads(r.text)
+        # assume the first one is the closest result
+        item = data['categories'][0]['items'][0]
+        return AnimeItem(
+            title=MyAnimeList._get_japanese_name(item['url']),
+            score=float(item['payload']['score']),
+            userscore=None
+        )
+
+    @classmethod
+    def _get_japanese_name(cls, url):
+        """Get the japanese name of the anime in this url.
+
+        :param str url: The given url of this anime.
+        :returns: the name of this anime.
+        :rtype: str
+
+        """
+        def is_japanese_name(x):
+            target = x.find('span', class_='dark_text')
+            return target is not None and target.string == "Japanese:"
+
+        r = requests.get(url)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.content, "lxml")
+        jpname = list(
+            filter(is_japanese_name, soup.find_all(class_='spaceit_pad'))
+        )
+        return (
+            jpname[-1].contents[-1].strip() if len(jpname) > 0 else
+            soup.find('span', attrs={'itemprop': 'name'}).string
+        )

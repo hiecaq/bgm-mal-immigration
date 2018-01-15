@@ -77,6 +77,19 @@ def mock_mal():
             body=get_content('mal', 'collect.html'),
             status=200
         )
+        rsps.add(
+            responses.GET,
+            'https://myanimelist.net/search/prefix.json',
+            body=get_content('mal', 'search.json'),
+            #  match_querystring=True,
+            status=200
+        )
+        rsps.add(
+            responses.GET,
+            'https://myanimelist.net/anime/9/xyzxyz',
+            body=get_content('mal', 'search.html'),
+            status=200
+        )
         yield rsps
 
 

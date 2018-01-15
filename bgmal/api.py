@@ -3,12 +3,14 @@
     bgm_mal_immigration.api
     ~~~~~~~~~~~~~~~~~~~~~~~
 
-    Defines ABCs for bgm and mal module
+    Defines predefined ABCs as specifications and public
+    used classes for this module
 
     :copyright: (c) 2017 by quinoa42.
     :license: MIT, see LICENSE for more details.
 """
 
+import collections
 from abc import ABC, abstractmethod
 
 
@@ -39,3 +41,20 @@ class AnimeWebsite(ABC):
 
         """
         pass
+
+    @abstractmethod
+    def search(self, title):
+        """Return an ``Anime`` object representing the anime entry
+        of this search result.
+
+        :param str title: the title user wish to search
+        :returns: an ``AnimeItem`` object representing the search result
+        :rtype: AnimeItem
+
+        """
+        pass
+
+
+AnimeItem = collections.namedtuple(
+    'AnimeItem', ['title', 'score', 'userscore']
+)
