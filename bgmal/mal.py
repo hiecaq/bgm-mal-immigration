@@ -24,6 +24,26 @@ class IllegalPasswordException(Exception):
     pass
 
 
+def _search(title):
+    """Search and return an ``AnimeItem`` object representing the result.
+
+    :param str title: the title user wish to search.
+    :returns: an dict contains interesting informations.
+
+    """
+    r = requests.get(
+        'https://myanimelist.net/search/prefix.json',
+        params={
+            'type': 'anime',
+            'keyword': title
+        }
+    )
+    r.raise_for_status()
+    data = json.loads(r.text)
+    # assume the first one is the closest result
+    return data['categories'][0]['items'][0]
+
+
 class MyAnimeList(AnimeWebsite):
     """Manipulate the MAL api"""
 
@@ -88,15 +108,7 @@ class MyAnimeList(AnimeWebsite):
         :rtype: AnimeItem
 
         """
-        r = requests.get(
-            'https://myanimelist.net/search/prefix.json',
-            params={'type': 'anime',
-                    'keyword': title}
-        )
-        r.raise_for_status()
-        data = json.loads(r.text)
-        # assume the first one is the closest result
-        item = data['categories'][0]['items'][0]
+        item = _search(title)
         return AnimeItem(
             title=MyAnimeList._get_japanese_name(item['url']),
             score=float(item['payload']['score']),
@@ -112,6 +124,7 @@ class MyAnimeList(AnimeWebsite):
         :rtype: str
 
         """
+
         def is_japanese_name(x):
             target = x.find('span', class_='dark_text')
             return target is not None and target.string == "Japanese:"
@@ -124,5 +137,19 @@ class MyAnimeList(AnimeWebsite):
         )
         return (
             jpname[-1].contents[-1].strip() if len(jpname) > 0 else
-            soup.find('span', attrs={'itemprop': 'name'}).string
+            soup.find('span', attrs={
+                'itemprop': 'name'
+            }).string
         )
+
+    def mark_as_watched(self, anime_item):
+        """Mark the given anime as watched with the given score, return true
+        if this call succeeds.
+
+        :param AnimeItem title: an AnimeItem that the user want to mark
+        as watched.
+        :returns: true or false
+        :rtype: bool
+
+        """
+        anime_item.title
