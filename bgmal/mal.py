@@ -95,10 +95,11 @@ class MyAnimeList(AnimeWebsite):
         soup = BeautifulSoup(r.content, 'lxml')
         items = soup.find(class_='list-table')['data-items']
         data = json.loads(items)
-        return [{
-            'title': entry['anime_title'],
-            'score': entry['score']
-        } for entry in data]
+        return [AnimeItem(
+            title=entry['anime_title'],
+            userscore=entry['score'],
+            score=None
+        ) for entry in data]
 
     def search(self, title):
         """Search and return an ``AnimeItem`` object representing the result.

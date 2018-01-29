@@ -38,8 +38,8 @@ class TestMyAnimeList(object):
         assert len(watchlist) == 73
 
         entry = watchlist[1]
-        assert entry['title'] == 'Ao no Exorcist Movie'
-        assert entry['score'] == 8
+        assert entry.title == 'Ao no Exorcist Movie'
+        assert entry.userscore == 8
 
     def test_search(self):
         a = MyAnimeList("ACCOUNT@EXAMPLE.COM", "PASSWORD")
