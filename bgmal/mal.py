@@ -11,6 +11,8 @@
 
 import json
 import logging
+import re
+import time
 
 import requests
 from bs4 import BeautifulSoup
@@ -18,6 +20,26 @@ from bs4 import BeautifulSoup
 from .api import AnimeItem, AnimeWebsite, LoginFailedException
 
 logger = logging.getLogger(__name__)
+
+ANIME_VALUES = """\
+<?xml version="1.0" encoding="UTF-8"?>
+<entry>
+<episode>{episode}</episode>
+<status>2</status>
+<score>{userscore}</score>
+<storage_type></storage_type>
+<storage_value></storage_value>
+<times_rewatched></times_rewatched>
+<rewatch_value></rewatch_value>
+<date_start></date_start>
+<date_finish></date_finish>
+<priority></priority>
+<enable_discussion></enable_discussion>
+<enable_rewatching></enable_rewatching>
+<comments></comments>
+<tags></tags>
+</entry>\
+"""
 
 
 class IllegalPasswordException(Exception):
@@ -95,11 +117,13 @@ class MyAnimeList(AnimeWebsite):
         soup = BeautifulSoup(r.content, 'lxml')
         items = soup.find(class_='list-table')['data-items']
         data = json.loads(items)
-        return [AnimeItem(
-            title=entry['anime_title'],
-            userscore=entry['score'],
-            score=None
-        ) for entry in data]
+        return [
+            AnimeItem(
+                title=entry['anime_title'],
+                userscore=entry['score'],
+                score=None
+            ) for entry in data
+        ]
 
     def search(self, title):
         """Search and return an ``AnimeItem`` object representing the result.
@@ -111,13 +135,13 @@ class MyAnimeList(AnimeWebsite):
         """
         item = _search(title)
         return AnimeItem(
-            title=MyAnimeList._get_japanese_name(item['url']),
+            title=MyAnimeList._get_info(item['url'], 'Japanese'),
             score=float(item['payload']['score']),
             userscore=None
         )
 
     @classmethod
-    def _get_japanese_name(cls, url):
+    def _get_info(cls, url, information):
         """Get the japanese name of the anime in this url.
 
         :param str url: The given url of this anime.
@@ -126,18 +150,23 @@ class MyAnimeList(AnimeWebsite):
 
         """
 
-        def is_japanese_name(x):
+        def is_target(x):
             target = x.find('span', class_='dark_text')
-            return target is not None and target.string == "Japanese:"
+            return target is not None and target.string == information + ":"
+
+        time.sleep(0.5)
 
         r = requests.get(url)
         r.raise_for_status()
         soup = BeautifulSoup(r.content, "lxml")
-        jpname = list(
-            filter(is_japanese_name, soup.find_all(class_='spaceit_pad'))
+        info = list(
+            filter(
+                is_target,
+                soup.find_all('div', class_=re.compile('spaceit(_pad)?'))
+            )
         )
         return (
-            jpname[-1].contents[-1].strip() if len(jpname) > 0 else
+            info[-1].contents[-1].strip() if len(info) > 0 else
             soup.find('span', attrs={
                 'itemprop': 'name'
             }).string
@@ -153,4 +182,30 @@ class MyAnimeList(AnimeWebsite):
         :rtype: bool
 
         """
-        anime_item.title
+        time.sleep(0.5)
+
+        item = _search(anime_item.title)
+        url = 'https://myanimelist.net/api/animelist/add/{0}.xml'.format(
+            item['id']
+        )
+        try:
+            episode = int(MyAnimeList._get_info(item['url'], 'Episodes'))
+            print(episode)
+        except ValueError as e:
+            return False
+        r = requests.get(
+            url,
+            auth=(self._account, self._password),
+            params={
+                'data':
+                    ANIME_VALUES.format(
+                        episode=episode, userscore=anime_item.userscore
+                    )
+            }
+        )
+        # OMG it actually return 400 Client Error if the anime is watched
+        if not r.status_code == 400:
+            r.raise_for_status()
+            return True
+
+        return False
