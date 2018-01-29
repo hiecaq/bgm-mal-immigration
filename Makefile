@@ -6,8 +6,8 @@ test:
 install:
 	@pip install -e .
 
-unintall:
-	@pip uninstall bgm_mal_immigration
+uninstall:
+	@pip uninstall bgmal
 
 create:
 	@python setup.py sdist bdist_wheel

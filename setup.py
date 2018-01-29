@@ -8,11 +8,11 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='bgm_mal_immigration',
+    name='bgmal',
     use_scm_version=True,
     description='Immigrate watched anime list from Bangumi to MyAnimeList',
     long_description=long_description,
-    url='https://github.com/quinoa42/s1acker',
+    url='https://github.com/quinoa42/bgm_mal_immigration',
     author='quinoa42',
     author_email='',
     license='MIT',

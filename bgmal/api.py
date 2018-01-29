@@ -44,12 +44,25 @@ class AnimeWebsite(ABC):
 
     @abstractmethod
     def search(self, title):
-        """Return an ``Anime`` object representing the anime entry
+        """Return an ``AnimeItem`` object representing the anime entry
         of this search result.
 
         :param str title: the title user wish to search
         :returns: an ``AnimeItem`` object representing the search result
         :rtype: AnimeItem
+
+        """
+        pass
+
+    @abstractmethod
+    def mark_as_watched(self, anime_item):
+        """Mark the given anime as watched with the given score, return true
+        if this call succeeds.
+
+        :param AnimeItem title: an AnimeItem that the user want to mark
+                                as watched.
+        :returns: true or false
+        :rtype: bool
 
         """
         pass
