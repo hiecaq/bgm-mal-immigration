@@ -127,6 +127,19 @@ class Bangumi(AnimeWebsite):
             next((raw for raw in get_raw_result() if raw['type'] == 2), None)
         )
 
+    def mark_as_watched(self, anime_item):
+        """Mark the given anime as watched with the given score, return true
+        if this call succeeds.
+
+        :param AnimeItem title: an AnimeItem that the user want to mark
+                                as watched.
+        :returns: true or false
+        :rtype: bool
+
+        """
+        # TODO
+        return False
+
 
 def Bgmanime(item):
     """Build an AnimeItem with the given soup."""

@@ -190,7 +190,6 @@ class MyAnimeList(AnimeWebsite):
         )
         try:
             episode = int(MyAnimeList._get_info(item['url'], 'Episodes'))
-            print(episode)
         except ValueError as e:
             return False
         r = requests.get(
