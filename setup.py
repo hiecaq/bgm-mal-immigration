@@ -12,7 +12,7 @@ setup(
     use_scm_version=True,
     description='Immigrate watched anime list from Bangumi to MyAnimeList',
     long_description=long_description,
-    url='https://github.com/quinoa42/bgm_mal_immigration',
+    url='https://github.com/quinoa42/bgm-mal-immigration',
     author='quinoa42',
     author_email='',
     license='MIT',
