@@ -73,7 +73,7 @@ def parse_args(argv):
 
 def load_config(filename):
     with open(filename) as f:
-        config = json.loads(f)
+        config = json.loads(f.read())
 
     a = MyAnimeList(config['mal']['account'], config['mal']['password'])
     b = Bangumi(config['bgm']['account'], config['bgm']['password'])
