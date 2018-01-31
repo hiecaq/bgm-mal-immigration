@@ -10,6 +10,8 @@ Due to the limitation of APIs, this scripts is highly unpredictable in
 that it could mark some specials instead of the real series. So far,
 only ``bgm2mal`` is implemented.
 
+This Project is deprecated. Further development will be done in project `hiromi`_.
+
 Usage
 -----
 
@@ -37,3 +39,4 @@ Installation
 
 .. _Bangumi: https://bgm.tv
 .. _MyAnimeList: https://myanimelist.net/
+.. _hiromi: https://github.com/quinoa42/hiromi
